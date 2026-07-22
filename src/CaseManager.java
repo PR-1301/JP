@@ -2,10 +2,13 @@ import java.util.ArrayList;
 
 public class CaseManager {
 
-    private ArrayList<CaseRecord> cases = new ArrayList<>();
+    private final ArrayList<CaseRecord> cases = new ArrayList<>();
 
     // Add a new case
     public void addCase(CaseRecord record) {
+        if (record == null) {
+            throw new IllegalArgumentException("Case record cannot be null.");
+        }
         cases.add(record);
     }
 
@@ -23,8 +26,11 @@ public class CaseManager {
 
     // Search case by Survey Number
     public CaseRecord searchCase(String surveyNo) {
+        if (surveyNo == null) {
+            return null;
+        }
         for (CaseRecord c : cases) {
-            if (c.getSurveyNo().equalsIgnoreCase(surveyNo)) {
+            if (surveyNo.equalsIgnoreCase(c.getSurveyNo())) {
                 return c;
             }
         }
@@ -33,8 +39,11 @@ public class CaseManager {
 
     // Search case by Case ID
     public CaseRecord searchCaseById(String caseId) {
+        if (caseId == null) {
+            return null;
+        }
         for (CaseRecord c : cases) {
-            if (c.getCaseId().equalsIgnoreCase(caseId)) {
+            if (caseId.equalsIgnoreCase(c.getCaseId())) {
                 return c;
             }
         }
