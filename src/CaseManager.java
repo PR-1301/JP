@@ -1,8 +1,50 @@
 import java.util.ArrayList;
+import java.io.*;
 
 public class CaseManager {
 
-    private final ArrayList<CaseRecord> cases = new ArrayList<>();
+    private ArrayList<CaseRecord> cases = new ArrayList<>();
+    private final String FILE_NAME = "cases.dat";
+
+    public CaseManager() {
+        loadData();
+        if (cases.isEmpty()) {
+            generateDummyData();
+        }
+    }
+
+    private void generateDummyData() {
+        String[] statuses = {"Pending", "Resolved", "In Court", "Appealed", "Closed"};
+        
+        for (int i = 1; i <= 50; i++) {
+            String caseId = "CASE-" + (5000 + i);
+            String surveyNo = "SVY-" + (1000 + (i * 2)); // Matches every second dummy land
+            String status = statuses[i % statuses.length];
+            
+            cases.add(new CaseRecord(caseId, surveyNo, status));
+        }
+        saveData();
+        System.out.println("Auto-generated 50 dummy case records.");
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadData() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            cases = (ArrayList<CaseRecord>) ois.readObject();
+        } catch (FileNotFoundException e) {
+            // File not found on first run, ignore
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading cases: " + e.getMessage());
+        }
+    }
+
+    private void saveData() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            oos.writeObject(cases);
+        } catch (IOException e) {
+            System.out.println("Error saving cases: " + e.getMessage());
+        }
+    }
 
     // Add a new case
     public void addCase(CaseRecord record) {
@@ -10,6 +52,7 @@ public class CaseManager {
             throw new IllegalArgumentException("Case record cannot be null.");
         }
         cases.add(record);
+        saveData();
     }
 
     // Display all cases
@@ -56,6 +99,7 @@ public class CaseManager {
 
         if (record != null) {
             record.setStatus(newStatus);
+            saveData();
             System.out.println("Case updated successfully.");
         } else {
             System.out.println("Case not found.");
@@ -68,6 +112,7 @@ public class CaseManager {
 
         if (record != null) {
             cases.remove(record);
+            saveData();
             System.out.println("Case deleted successfully.");
         } else {
             System.out.println("Case not found.");

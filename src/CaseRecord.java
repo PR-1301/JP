@@ -1,4 +1,6 @@
-public class CaseRecord {
+import java.io.Serializable;
+
+public class CaseRecord implements Serializable {
 
     private String caseId;
     private String surveyNo;

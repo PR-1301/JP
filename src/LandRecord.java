@@ -1,4 +1,6 @@
-public class LandRecord {
+import java.io.Serializable;
+
+public class LandRecord implements Serializable {
 
     private String surveyNo;
     private String owner;
