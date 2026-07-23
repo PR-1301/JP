@@ -2,13 +2,13 @@ import java.util.Scanner;
 
 public class Admin extends User {
 
-    public Admin(String username, String password, LandManager landManager, CaseManager caseManager){
+    public Admin(String username, String password, LandManager landManager, CaseManager caseManager) {
         super(username, password, landManager, caseManager);
     }
 
     @Override
-    public void showMenu(Scanner scanner){
-        while(true) {
+    public void showMenu(Scanner scanner) {
+        while (true) {
             System.out.println("\n--- Admin Menu ---");
             System.out.println("1. Add Land Record");
             System.out.println("2. Display All Land Records");
@@ -18,9 +18,9 @@ public class Admin extends User {
             System.out.println("6. Display All Cases");
             System.out.println("7. Logout");
             System.out.print("Enter choice: ");
-            
+
             String choice = scanner.nextLine();
-            switch(choice) {
+            switch (choice) {
                 case "1":
                     System.out.print("Enter Survey No: ");
                     String surveyNo = scanner.nextLine();
@@ -28,7 +28,7 @@ public class Admin extends User {
                     String owner = scanner.nextLine();
                     System.out.print("Enter Village: ");
                     String village = scanner.nextLine();
-                    System.out.print("Enter Area: ");
+                    System.out.print("Enter Area No: ");
                     try {
                         double area = Double.parseDouble(scanner.nextLine());
                         landManager.addLand(new LandRecord(surveyNo, owner, village, area));
