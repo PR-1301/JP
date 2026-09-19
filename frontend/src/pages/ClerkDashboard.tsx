@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
-import { mockLandRecords, mockCases } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import type { LandRecord, LitigationCase } from '../data/mockData';
 import { DataTable } from '../components/ui/DataTable';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { FileText, Scale, Plus, Map as MapIcon, List, Columns } from 'lucide-react';
 import { MapComponent } from '../components/ui/MapComponent';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 export const ClerkDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'records' | 'cases'>('records');
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const activeTab = location.pathname.includes('/cases') ? 'cases' : 'records';
+  
   const [recordViewMode, setRecordViewMode] = useState<'list' | 'map'>('list');
   const [caseViewMode, setCaseViewMode] = useState<'list' | 'kanban'>('kanban');
+
+  const [records, setRecords] = useState<LandRecord[]>([]);
+  const [cases, setCases] = useState<LitigationCase[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [r, c] = await Promise.all([api.getRecords(), api.getCases()]);
+        setRecords(r);
+        setCases(c);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const recordColumns = [
     { header: 'Survey No.', accessor: 'surveyNumber' as const, className: 'font-mono font-medium' },
@@ -50,11 +75,11 @@ export const ClerkDashboard: React.FC = () => {
 
       <div className="border-b border-neutral-200 flex justify-between items-end">
         <nav className="-mb-px flex space-x-8">
-          <button onClick={() => setActiveTab('records')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'records' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>
+          <button onClick={() => navigate('/clerk')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'records' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>
             <FileText className={`w-4 h-4 mr-2 ${activeTab === 'records' ? 'text-indigo-500' : 'text-neutral-400'}`} />
             Land Records
           </button>
-          <button onClick={() => setActiveTab('cases')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'cases' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>
+          <button onClick={() => navigate('/clerk/cases')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'cases' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>
             <Scale className={`w-4 h-4 mr-2 ${activeTab === 'cases' ? 'text-indigo-500' : 'text-neutral-400'}`} />
             Litigation Cases
           </button>
@@ -105,13 +130,17 @@ export const ClerkDashboard: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {recordViewMode === 'list' ? (
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : recordViewMode === 'list' ? (
                 <div className="space-y-4">
-                  <DataTable columns={recordColumns} data={mockLandRecords} onRowClick={(row) => console.log('Row clicked', row)} />
+                  <DataTable columns={recordColumns} data={records} onRowClick={(row) => console.log('Row clicked', row)} />
                 </div>
               ) : (
                 <div className="glass-panel p-2 shadow-xl border-white">
-                  <MapComponent records={mockLandRecords} height="650px" />
+                  <MapComponent records={records} height="650px" />
                 </div>
               )}
             </motion.div>
@@ -123,9 +152,13 @@ export const ClerkDashboard: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {caseViewMode === 'list' ? (
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : caseViewMode === 'list' ? (
                 <div className="space-y-4">
-                  <DataTable columns={caseColumns} data={mockCases} onRowClick={(row) => console.log('Row clicked', row)} />
+                  <DataTable columns={caseColumns} data={cases} onRowClick={(row) => console.log('Row clicked', row)} />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -134,12 +167,12 @@ export const ClerkDashboard: React.FC = () => {
                       <div className="flex items-center justify-between mb-4 px-2">
                         <h3 className="font-semibold text-neutral-700">{col.title}</h3>
                         <span className="bg-white text-neutral-600 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
-                          {mockCases.filter(c => c.status === col.id).length}
+                          {cases.filter(c => c.status === col.id).length}
                         </span>
                       </div>
                       
                       <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2">
-                        {mockCases.filter(c => c.status === col.id).map((caseItem, idx) => (
+                        {cases.filter(c => c.status === col.id).map((caseItem, idx) => (
                           <motion.div 
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}

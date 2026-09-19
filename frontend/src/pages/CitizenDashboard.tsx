@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Search, MapPin, User, Hash, ShieldCheck, FileText } from 'lucide-react';
-import { mockLandRecords, mockCases } from '../data/mockData';
 import type { LandRecord, LitigationCase } from '../data/mockData';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { Timeline } from '../components/ui/Timeline';
 import { MapComponent } from '../components/ui/MapComponent';
+import { api } from '../services/api';
 
 export const CitizenDashboard: React.FC = () => {
   const [surveyNumber, setSurveyNumber] = useState('');
@@ -15,7 +15,7 @@ export const CitizenDashboard: React.FC = () => {
   const [record, setRecord] = useState<LandRecord | null>(null);
   const [cases, setCases] = useState<LitigationCase[]>([]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!surveyNumber.trim()) return;
     
@@ -29,19 +29,20 @@ export const CitizenDashboard: React.FC = () => {
       setTimeout(() => setTerminalStep(index + 1), delay);
     });
     
-    setTimeout(() => {
-      const foundRecord = mockLandRecords.find(r => r.surveyNumber.toLowerCase() === surveyNumber.trim().toLowerCase());
-      setRecord(foundRecord || null);
-      
-      if (foundRecord) {
-        const linkedCases = mockCases.filter(c => c.surveyNumber === foundRecord.surveyNumber);
-        setCases(linkedCases);
-      } else {
-        setCases([]);
-      }
-      
+    // Minimum terminal animation time
+    await new Promise(r => setTimeout(r, 3500));
+    
+    try {
+      const data = await api.getRecordBySurvey(surveyNumber.trim());
+      setRecord(data.record);
+      setCases(data.cases);
+    } catch (error) {
+      console.error(error);
+      setRecord(null);
+      setCases([]);
+    } finally {
       setIsSearching(false);
-    }, 3500); // Wait for terminal simulation to finish
+    }
   };
 
   return (

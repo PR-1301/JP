@@ -3,15 +3,49 @@ import { StatCard } from '../components/ui/StatCard';
 import { DataTable } from '../components/ui/DataTable';
 import { BlockchainNode } from '../components/ui/BlockchainNode';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { mockUsers, mockBlockchain, mockLandRecords, mockCases } from '../data/mockData';
 import { Users, FileText, Scale, Database, RefreshCw, Download, Map as MapIcon, BarChart3 } from 'lucide-react';
 import { MapComponent } from '../components/ui/MapComponent';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
+import type { LandRecord, LitigationCase, User, Block } from '../data/mockData';
 
 export const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'audit'>('overview');
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const activeTab = location.pathname.includes('/users') ? 'users' : location.pathname.includes('/audit') ? 'audit' : 'overview';
+  
   const [isValidating, setIsValidating] = useState(false);
   const [isChainValid, setIsChainValid] = useState<boolean | null>(null);
+
+  const [records, setRecords] = useState<LandRecord[]>([]);
+  const [cases, setCases] = useState<LitigationCase[]>([]);
+  const [blockchain, setBlockchain] = useState<Block[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [r, c, b] = await Promise.all([
+          api.getRecords(),
+          api.getCases(),
+          api.getBlockchain()
+        ]);
+        setRecords(r);
+        setCases(c);
+        setBlockchain(b);
+        // Note: Users API not explicitly built, falling back to empty array for now
+        setUsers([]); 
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleVerifyChain = () => {
     setIsValidating(true);
@@ -40,8 +74,8 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   const caseData = [
-    { name: 'Open', cases: mockCases.filter(c => c.status === 'open' || c.status === 'in_progress').length },
-    { name: 'Closed', cases: mockCases.filter(c => c.status === 'closed').length },
+    { name: 'Open', cases: cases.filter(c => c.status === 'open' || c.status === 'in_progress').length },
+    { name: 'Closed', cases: cases.filter(c => c.status === 'closed').length },
   ];
 
   return (
@@ -55,20 +89,24 @@ export const AdminDashboard: React.FC = () => {
 
       <div className="border-b border-neutral-200">
         <nav className="-mb-px flex space-x-8">
-          <button onClick={() => setActiveTab('overview')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'overview' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Overview</button>
-          <button onClick={() => setActiveTab('users')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'users' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Users</button>
-          <button onClick={() => setActiveTab('audit')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'audit' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Audit Trail</button>
+          <button onClick={() => navigate('/admin')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'overview' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Overview</button>
+          <button onClick={() => navigate('/admin/users')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'users' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Users</button>
+          <button onClick={() => navigate('/admin/audit')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${activeTab === 'audit' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}>Audit Trail</button>
         </nav>
       </div>
 
       <div className="mt-6">
-        {activeTab === 'overview' && (
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : activeTab === 'overview' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard title="Total Records" value={mockLandRecords.length.toString()} icon={FileText} trend={{ value: '12%', isPositive: true }} delay={0} />
-              <StatCard title="Active Cases" value={mockCases.length.toString()} icon={Scale} trend={{ value: '2%', isPositive: false }} delay={100} />
-              <StatCard title="Registered Users" value={mockUsers.length.toString()} icon={Users} delay={200} />
-              <StatCard title="Blockchain Nodes" value={mockBlockchain.length.toString()} icon={Database} delay={300} />
+              <StatCard title="Total Records" value={records.length.toString()} icon={FileText} trend={{ value: '12%', isPositive: true }} delay={0} />
+              <StatCard title="Active Cases" value={cases.length.toString()} icon={Scale} trend={{ value: '2%', isPositive: false }} delay={100} />
+              <StatCard title="Registered Users" value={users.length.toString()} icon={Users} delay={200} />
+              <StatCard title="Blockchain Nodes" value={blockchain.length.toString()} icon={Database} delay={300} />
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in zoom-in-95 delay-150 fill-mode-both">
@@ -85,7 +123,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex-1 relative rounded-xl overflow-hidden border border-neutral-100">
-                  <MapComponent records={mockLandRecords} zoom={12} height="100%" />
+                  <MapComponent records={records} zoom={12} height="100%" />
                 </div>
               </div>
 
@@ -137,13 +175,13 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'users' && (
+        {!isLoading && activeTab === 'users' && (
           <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-            <DataTable columns={userColumns} data={mockUsers} />
+            <DataTable columns={userColumns} data={users} />
           </div>
         )}
 
-        {activeTab === 'audit' && (
+        {!isLoading && activeTab === 'audit' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-neutral-200 shadow-soft">
               <div>
@@ -171,7 +209,7 @@ export const AdminDashboard: React.FC = () => {
             )}
 
             <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-[2.25rem] before:w-0.5 before:bg-indigo-100 before:-z-10">
-              {mockBlockchain.map((block) => (
+              {blockchain.map((block) => (
                 <BlockchainNode key={block.hash} block={block} isValidated={isChainValid === true} />
               ))}
             </div>
