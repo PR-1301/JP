@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { LandRecord } from '../../data/mockData';
@@ -21,6 +21,13 @@ const customMarkerIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+const pulseIcon = new L.DivIcon({
+  className: 'custom-pulse-marker',
+  html: `<div class="relative w-4 h-4 bg-indigo-500 rounded-full border-2 border-white shadow-md"><div class="pulse-ring"></div></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8]
+});
+
 interface MapComponentProps {
   records: LandRecord[];
   center?: [number, number];
@@ -29,10 +36,18 @@ interface MapComponentProps {
   className?: string;
 }
 
-// Component to dynamically update map center
+// Component to dynamically update map center and fix resizing bugs
 const ChangeView: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
   const map = useMap();
-  map.setView(center, zoom);
+  useEffect(() => {
+    map.setView(center, zoom);
+    // Fix leaflet map rendering bug in tabs/modals by invalidating size after a short delay
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [center, zoom, map]);
+  
   return null;
 };
 
@@ -66,7 +81,7 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           <Marker 
             key={record.id} 
             position={record.coordinates}
-            icon={customMarkerIcon}
+            icon={record.status === 'litigation' || record.status === 'disputed' ? pulseIcon : customMarkerIcon}
           >
             <Popup className="premium-popup">
               <div className="p-1 space-y-2 min-w-[200px]">

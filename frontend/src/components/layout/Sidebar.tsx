@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { LogOut, Home, FileText, Scale, Users, Database } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -10,11 +10,10 @@ export function cn(...inputs: (string | undefined | null | false)[]) {
 
 interface SidebarProps {
   role: 'citizen' | 'clerk' | 'admin';
+  onLogout: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ role }) => {
-  const navigate = useNavigate();
-  
+export const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
   const getLinks = () => {
     switch (role) {
       case 'citizen':
@@ -79,8 +78,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role }) => {
       
       <div className="p-4 border-t border-neutral-200/50">
         <button 
-          onClick={() => navigate('/')}
-          className="flex items-center w-full px-4 py-2.5 text-sm font-medium text-neutral-600 rounded-xl hover:bg-neutral-50 hover:text-red-600 transition-colors group"
+          onClick={onLogout}
+          className="flex items-center w-full px-4 py-2.5 text-sm font-medium text-neutral-600 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors group"
         >
           <LogOut className="w-5 h-5 mr-3 text-neutral-400 group-hover:text-red-500 transition-colors" />
           Logout

@@ -10,6 +10,7 @@ export const CitizenDashboard: React.FC = () => {
   const [surveyNumber, setSurveyNumber] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [terminalStep, setTerminalStep] = useState(0);
   
   const [record, setRecord] = useState<LandRecord | null>(null);
   const [cases, setCases] = useState<LitigationCase[]>([]);
@@ -20,6 +21,13 @@ export const CitizenDashboard: React.FC = () => {
     
     setIsSearching(true);
     setHasSearched(true);
+    setTerminalStep(0);
+    
+    // Simulate terminal steps
+    const steps = [400, 1200, 2000, 2800];
+    steps.forEach((delay, index) => {
+      setTimeout(() => setTerminalStep(index + 1), delay);
+    });
     
     setTimeout(() => {
       const foundRecord = mockLandRecords.find(r => r.surveyNumber.toLowerCase() === surveyNumber.trim().toLowerCase());
@@ -33,7 +41,7 @@ export const CitizenDashboard: React.FC = () => {
       }
       
       setIsSearching(false);
-    }, 800);
+    }, 3500); // Wait for terminal simulation to finish
   };
 
   return (
@@ -66,6 +74,27 @@ export const CitizenDashboard: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Terminal Verification Animation */}
+      {isSearching && (
+        <div className="max-w-2xl mx-auto bg-neutral-900 rounded-xl p-6 font-mono text-sm shadow-2xl overflow-hidden relative">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none"></div>
+          <div className="flex items-center mb-4 space-x-2">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="ml-4 text-neutral-500 text-xs">secure-verification.sh</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-green-400">&gt; Initiating query for survey: {surveyNumber}</div>
+            {terminalStep >= 1 && <div className="text-neutral-300">&gt; Connecting to Node 3 (192.168.1.104)... [OK]</div>}
+            {terminalStep >= 2 && <div className="text-neutral-300">&gt; Requesting ledger history...</div>}
+            {terminalStep >= 3 && <div className="text-yellow-400">&gt; Verifying SHA-256 cryptographic hashes...</div>}
+            {terminalStep >= 4 && <div className="text-green-400 font-bold mt-4">&gt; CONSENSUS REACHED. DECRYPTING DATA...</div>}
+            <div className="animate-pulse text-indigo-400 mt-2">_</div>
+          </div>
+        </div>
+      )}
 
       {hasSearched && !isSearching && !record && (
         <div className="text-center py-16 animate-in fade-in zoom-in-95 bg-white border border-neutral-100 rounded-3xl shadow-sm max-w-2xl mx-auto">

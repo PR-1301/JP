@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Scale, Fingerprint, Shield, FileText } from 'lucide-react';
 import { mockUsers } from '../data/mockData';
+import Tilt from 'react-parallax-tilt';
 
 interface LoginProps {
   onLogin: (role: 'citizen' | 'clerk' | 'admin', name: string) => void;
@@ -73,59 +74,56 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
 
           <div className="space-y-4">
-            <button 
-              onClick={() => handleLogin('citizen')}
-              className="w-full group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-white hover:border-indigo-600 hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)] transition-all duration-300 text-left"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-xl bg-neutral-50 group-hover:bg-indigo-50 flex items-center justify-center transition-colors">
-                  <Fingerprint className="w-6 h-6 text-neutral-400 group-hover:text-indigo-600 transition-colors" />
+            <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
+              <button 
+                onClick={() => handleLogin('citizen')}
+                className="w-full group flex items-center justify-between p-4 rounded-2xl border border-white/40 bg-white/60 backdrop-blur-md shadow-soft hover:border-indigo-400 hover:shadow-[0_0_30px_rgb(79,70,229,0.2)] transition-all duration-300 text-left"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl bg-white/80 group-hover:bg-indigo-50 flex items-center justify-center transition-colors shadow-sm">
+                    <Fingerprint className="w-6 h-6 text-neutral-500 group-hover:text-indigo-600 transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Citizen Portal</h3>
+                    <p className="text-xs text-neutral-500">Public land record lookup</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Citizen Portal</h3>
-                  <p className="text-xs text-neutral-500">Public land record lookup</p>
-                </div>
-              </div>
-              <div className="w-6 h-6 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-indigo-600 group-hover:bg-indigo-600 transition-colors">
-                <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </button>
+              </button>
+            </Tilt>
 
-            <button 
-              onClick={() => handleLogin('clerk')}
-              className="w-full group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-white hover:border-indigo-600 hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)] transition-all duration-300 text-left"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-xl bg-neutral-50 group-hover:bg-indigo-50 flex items-center justify-center transition-colors">
-                  <FileText className="w-6 h-6 text-neutral-400 group-hover:text-indigo-600 transition-colors" />
+            <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
+              <button 
+                onClick={() => handleLogin('clerk')}
+                className="w-full group flex items-center justify-between p-4 rounded-2xl border border-white/40 bg-white/60 backdrop-blur-md shadow-soft hover:border-indigo-400 hover:shadow-[0_0_30px_rgb(79,70,229,0.2)] transition-all duration-300 text-left"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl bg-white/80 group-hover:bg-indigo-50 flex items-center justify-center transition-colors shadow-sm">
+                    <FileText className="w-6 h-6 text-neutral-500 group-hover:text-indigo-600 transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Clerk Workspace</h3>
+                    <p className="text-xs text-neutral-500">Manage records and litigation</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Clerk Workspace</h3>
-                  <p className="text-xs text-neutral-500">Manage records and litigation</p>
-                </div>
-              </div>
-              <div className="w-6 h-6 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-indigo-600 group-hover:bg-indigo-600 transition-colors">
-                <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </button>
+              </button>
+            </Tilt>
 
-            <button 
-              onClick={() => handleLogin('admin')}
-              className="w-full group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-white hover:border-indigo-600 hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)] transition-all duration-300 text-left"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-xl bg-neutral-50 group-hover:bg-indigo-50 flex items-center justify-center transition-colors">
-                  <Shield className="w-6 h-6 text-neutral-400 group-hover:text-indigo-600 transition-colors" />
+            <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
+              <button 
+                onClick={() => handleLogin('admin')}
+                className="w-full group flex items-center justify-between p-4 rounded-2xl border border-white/40 bg-white/60 backdrop-blur-md shadow-soft hover:border-indigo-400 hover:shadow-[0_0_30px_rgb(79,70,229,0.2)] transition-all duration-300 text-left"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl bg-white/80 group-hover:bg-indigo-50 flex items-center justify-center transition-colors shadow-sm">
+                    <Shield className="w-6 h-6 text-neutral-500 group-hover:text-indigo-600 transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Admin Dashboard</h3>
+                    <p className="text-xs text-neutral-500">System config & Audit trail</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-900 transition-colors">Admin Dashboard</h3>
-                  <p className="text-xs text-neutral-500">System config & Audit trail</p>
-                </div>
-              </div>
-              <div className="w-6 h-6 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-indigo-600 group-hover:bg-indigo-600 transition-colors">
-                <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </button>
+              </button>
+            </Tilt>
           </div>
           
           <p className="text-center text-xs text-neutral-400">

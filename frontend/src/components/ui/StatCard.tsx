@@ -1,6 +1,6 @@
-import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion } from 'framer-motion';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -19,9 +19,12 @@ interface StatCardProps {
 
 export const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, delay = 0 }) => {
   return (
-    <div 
-      className="glass-panel p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 hover:shadow-soft-lg transition-all"
-      style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: delay / 1000, ease: "easeOut" }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      className="glass-panel p-6"
     >
       <div className="flex justify-between items-start">
         <div>
@@ -41,6 +44,6 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, tr
           <Icon className="w-6 h-6" />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Block } from '../../data/mockData';
 import { Link2, Hash, Clock, Database, CheckCircle, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface BlockchainNodeProps {
   block: Block;
@@ -10,13 +11,18 @@ interface BlockchainNodeProps {
 
 export const BlockchainNode: React.FC<BlockchainNodeProps> = ({ block, isValidated, isTampered = false }) => {
   return (
-    <div className={`relative flex items-start gap-4 p-6 rounded-2xl border transition-all duration-500 ${
-      isValidated 
-        ? isTampered 
-          ? 'bg-red-50/50 border-red-200 shadow-[0_0_15px_rgba(239,68,68,0.1)]' 
-          : 'bg-green-50/50 border-green-200 shadow-[0_0_15px_rgba(34,197,94,0.1)]'
-        : 'bg-surface border-neutral-200 shadow-soft hover:shadow-soft-lg'
-    }`}>
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: block.index * 0.1 }}
+      className={`relative flex items-start gap-4 p-6 rounded-2xl border transition-colors duration-500 ${
+        isValidated 
+          ? isTampered 
+            ? 'bg-red-50/50 border-red-200 shadow-[0_0_15px_rgba(239,68,68,0.1)]' 
+            : 'bg-green-50/50 border-green-200 shadow-[0_0_15px_rgba(34,197,94,0.1)]'
+          : 'holographic-node'
+      }`}
+    >
       
       {/* Node Icon */}
       <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500 ${
@@ -69,6 +75,6 @@ export const BlockchainNode: React.FC<BlockchainNodeProps> = ({ block, isValidat
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBadge } from './StatusBadge';
 import { Calendar, CheckCircle, Clock } from 'lucide-react';
 import type { Hearing } from '../../data/mockData';
+import { motion } from 'framer-motion';
 
 interface TimelineProps {
   hearings: Hearing[];
@@ -26,7 +27,12 @@ export const Timeline: React.FC<TimelineProps> = ({ hearings }) => {
               )}
             </span>
             
-            <div className="glass-panel p-5 animate-in fade-in slide-in-from-left-4" style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}>
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              className="glass-panel p-5"
+            >
               <div className="flex justify-between items-start mb-2">
                 <h4 className="text-base font-semibold text-neutral-900">{hearing.description}</h4>
                 <StatusBadge status={hearing.status} />
@@ -39,7 +45,7 @@ export const Timeline: React.FC<TimelineProps> = ({ hearings }) => {
                   day: 'numeric'
                 })}
               </div>
-            </div>
+            </motion.div>
           </div>
         );
       })}
