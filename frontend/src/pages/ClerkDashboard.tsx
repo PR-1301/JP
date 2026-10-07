@@ -65,8 +65,8 @@ export const ClerkDashboard: React.FC = () => {
         </div>
         
         <div className="flex space-x-3">
-          <button className="btn-secondary">Export Report</button>
-          <button className="btn-primary">
+          <button className="btn-secondary" onClick={() => alert('Exporting Report...')}>Export Report</button>
+          <button className="btn-primary" onClick={() => alert(activeTab === 'records' ? 'Opening New Record Form...' : 'Opening File Case Form...')}>
             <Plus className="w-4 h-4 mr-2" />
             {activeTab === 'records' ? 'New Record' : 'File Case'}
           </button>

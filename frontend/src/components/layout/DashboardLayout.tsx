@@ -1,5 +1,4 @@
 import React from 'react';
-import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { Outlet, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -22,7 +21,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, userName
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-neutral-900">
-      <Sidebar role={role} onLogout={handleLogout} />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar userRole={role} userName={userName} />
         <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Scale, Fingerprint, Shield, FileText } from 'lucide-react';
-import { mockUsers } from '../data/mockData';
+import { api } from '../services/api';
 import Tilt from 'react-parallax-tilt';
 
 interface LoginProps {
@@ -11,11 +11,15 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const navigate = useNavigate();
 
-  const handleLogin = (role: 'citizen' | 'clerk' | 'admin') => {
-    const user = mockUsers.find(u => u.role === role);
-    if (user) {
-      onLogin(role, user.name);
-      navigate(`/${role}`);
+  const handleLogin = async (role: 'citizen' | 'clerk' | 'admin') => {
+    try {
+      const response = await api.login(role);
+      if (response.success) {
+        onLogin(role, response.name);
+        navigate(`/${role}`);
+      }
+    } catch (error) {
+      console.error('Login failed', error);
     }
   };
 

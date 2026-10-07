@@ -71,10 +71,10 @@ export const MapComponent: React.FC<MapComponentProps> = ({
       >
         <ChangeView center={mapCenter} zoom={zoom} />
         
-        {/* Subtle, minimal map tiles (CartoDB Positron) for premium feel */}
+        {/* OpenStreetMap tiles (Free, no API key required) */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
         {records.map(record => (
