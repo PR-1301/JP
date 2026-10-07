@@ -21,6 +21,15 @@ export const ClerkDashboard: React.FC = () => {
   const [cases, setCases] = useState<LitigationCase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false);
+  const [newRecordData, setNewRecordData] = useState({
+    surveyNumber: '',
+    ownerName: '',
+    area: '',
+    address: ''
+  });
+  const [isAdding, setIsAdding] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,6 +44,23 @@ export const ClerkDashboard: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handleAddRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsAdding(true);
+    try {
+      await api.addRecord(newRecordData);
+      const updatedRecords = await api.getRecords();
+      setRecords(updatedRecords);
+      setIsAddRecordModalOpen(false);
+      setNewRecordData({ surveyNumber: '', ownerName: '', area: '', address: '' });
+    } catch (e) {
+      console.error(e);
+      alert('Failed to add record');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   const recordColumns = [
     { header: 'Survey No.', accessor: 'surveyNumber' as const, className: 'font-mono font-medium' },
@@ -66,12 +92,44 @@ export const ClerkDashboard: React.FC = () => {
         
         <div className="flex space-x-3">
           <button className="btn-secondary" onClick={() => alert('Exporting Report...')}>Export Report</button>
-          <button className="btn-primary" onClick={() => alert(activeTab === 'records' ? 'Opening New Record Form...' : 'Opening File Case Form...')}>
+          <button className="btn-primary" onClick={() => activeTab === 'records' ? setIsAddRecordModalOpen(true) : alert('Opening File Case Form...')}>
             <Plus className="w-4 h-4 mr-2" />
             {activeTab === 'records' ? 'New Record' : 'File Case'}
           </button>
         </div>
       </div>
+
+      {isAddRecordModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-4">Add New Land Record</h2>
+            <form onSubmit={handleAddRecord} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Survey Number</label>
+                <input required type="text" value={newRecordData.surveyNumber} onChange={(e) => setNewRecordData({...newRecordData, surveyNumber: e.target.value})} className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. SVY-3001" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Owner Name</label>
+                <input required type="text" value={newRecordData.ownerName} onChange={(e) => setNewRecordData({...newRecordData, ownerName: e.target.value})} className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. John Doe" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Area (Acres)</label>
+                <input required type="number" step="0.01" value={newRecordData.area} onChange={(e) => setNewRecordData({...newRecordData, area: e.target.value})} className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 1.5" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Location Address</label>
+                <input required type="text" value={newRecordData.address} onChange={(e) => setNewRecordData({...newRecordData, address: e.target.value})} className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Plot 14, Greenfield" />
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
+                <button type="button" onClick={() => setIsAddRecordModalOpen(false)} className="btn-secondary">Cancel</button>
+                <button type="submit" disabled={isAdding} className="btn-primary">
+                  {isAdding ? 'Adding...' : 'Add Record'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="border-b border-neutral-200 flex justify-between items-end">
         <nav className="-mb-px flex space-x-8">

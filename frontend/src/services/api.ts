@@ -17,6 +17,10 @@ export const api = {
       coordinates: [17.3850, 78.4867] // Fallback coordinates
     }));
   },
+  addRecord: async (recordData: Partial<LandRecord>) => {
+    const response = await axios.post(`${API_URL}/records`, recordData);
+    return response.data;
+  },
   getRecordBySurvey: async (surveyNumber: string) => {
     const response = await axios.get(`${API_URL}/records/${surveyNumber}`);
     const r = response.data.record;

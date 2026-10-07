@@ -24,6 +24,22 @@ app.get('/api/records', async (req, res) => {
   }
 });
 
+// Add Land Record
+app.post('/api/records', async (req, res) => {
+  try {
+    const { surveyNumber, ownerName, area, address } = req.body;
+    const registrationDate = new Date().toISOString().split('T')[0];
+    const [result]: any = await pool.query(
+      'INSERT INTO land_records (survey_number, owner_name, area, location, registration_date) VALUES (?, ?, ?, ?, ?)',
+      [surveyNumber, ownerName, area, address, registrationDate]
+    );
+    res.json({ success: true, id: result.insertId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to add land record' });
+  }
+});
+
 // 2. Get Single Land Record with Cases (For Citizen Dashboard)
 app.get('/api/records/:surveyNumber', async (req, res) => {
   try {
